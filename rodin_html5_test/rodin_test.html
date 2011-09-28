@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+    
+<head>
+    <meta charset="UTF-8">
+    <title>Test javascript</title>
+    
+    <link rel="stylesheet" type="text/css" href="rodin_test.css"/>
+    <script type="text/javascript" src="./scripts/jquery-1.6.4.min.js"></script>
+    <script type="text/javascript" src="./scripts/Rodin.js"></script>
+    <script type="text/javascript" src="./scripts/Rodin_Matrix32.js"></script>
+    <script type="text/javascript" src="./scripts/Rodin_Vector2.js"></script>
+    <script type="text/javascript" src="./scripts/RodinTestScene.js"></script>
+</head>init_viewport
+    
+<body>
+    <TABLE>
+    <TR>
+        <TH>
+            <H3>Rodin test</H3>
+        </TH>
+    </TR>
+    <TR>
+        <TD>
+            <canvas id="floorplan" class="floorplan">
+                <span>&lt;canvas&gt; markup not supported, please use a modern web browser.</span>
+            </canvas>
+        </TD>
+    </TR>
+    <TR>
+        <TD>
+            <INPUT id="trace_rectangle_button" type="button" value="Trace rectangle"/>
+        </TD>
+        <TD>
+        </TD>
+        
+    </TR>
+    
+    <script>
+        $(document).ready(function(){
+        
+            Rodin.initialize();
+        });
+    </script>
+</body>
+
+</html>
