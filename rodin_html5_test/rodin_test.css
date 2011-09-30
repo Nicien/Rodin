@@ -1,13 +1,73 @@
 
-TABLE.project_description_table
+TABLE.main_table
 {
     border-collapse:collapse;
 }
 
-CANVAS.floorplan
-{
-    
+TABLE.main_table TH {
+
 }
 
+TABLE.main_table TD {
+
+}
+
+CANVAS.floorplan
+{
+    border:solid thin red;
+    
+    /* i'm become old ;) */
+    width:320px;
+    height:200px;
+}
+
+/* generic container (i.e. div) for floating buttons */
+/*
+.clear { 
+    overflow: hidden;
+    width: 100%;
+}
+*/
+
+TABLE.toolbox_table {
+
+    border-collapse:collapse;
+}
+
+TABLE.toolbox_table TD {
+
+    border:solid 1px #6495ed;
+    width:140px;
+    text-align:center;
+    padding:0px 10px 0px 10px;
+}
+
+a.trace_button {
+
+    width:100%;
+    display: block;
+    height:25x;
+    font: normal 14x arial, sans-serif;
+    text-align:center;
+    text-decoration:none;
+
+    color: #444;
+    background-color: #EEE;
+    border-radius: 10px;
+    border:solid #444 1px;
+}
+
+a.trace_button_selected {
+    background-color: #AAA;
+    border:solid medium #444;
+    color: black;
+}
+
+a.trace_button:active {
+
+    color: black;
+    background-color: #AAA;
+    outline: none; /* hide dotted outline in Firefox */
+}
 
 

@@ -1,8 +1,7 @@
 
-
 // Rodin 2D:
-(function ()
-{  
+(function () {
+
     Rodin.Matrix32 = function(sx, shy, shx, sy, tx, ty)
     {
         this.sx = sx; this.shy = shy; this.shx = shx;
@@ -92,28 +91,27 @@
             this.x = 
         },
         */
+
+    }
+    
+    Rodin.Matrix32.create_identity = function() {
         
-        // static:
-        create_identity: function() {
+         return new Rodin.Matrix32(1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+    }
         
-            return new Matrix32(1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
-        },
+    Rodin.Matrix32.create_translation = function(x, y) {
         
-        create_translation: function(x, y) {
+        return new Rodin.Matrix32(1.0, 0.0, 0.0, 1.0, x, y);
+    }
         
-            return new Matrix32(1.0, 0.0, 0.0, 1.0, x, y);
-        },
+    Rodin.Matrix32.create_rotation = function(a) {
         
-        create_rotation: function(a) {
+        return new Rodin.Matrix32(cos(a), sin(a), -sin(a), cos(a), 0.0, 0.0);
+    }
         
-            return new Matrix32(cos(a), sin(a), -sin(a), cos(a), 0.0, 0.0);
-        },
+    Rodin.Matrix32.create_scaling = function(x, y) {
         
-        create_scaling: function(x, y) {
-        
-            return new Matrix32(x, 0.0, 0.0, y, 0.0, 0.0);
-        }
+        return new Rodin.Matrix32(x, 0.0, 0.0, y, 0.0, 0.0);
     }
 
 })()
-

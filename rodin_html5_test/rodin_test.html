@@ -10,11 +10,18 @@
     <script type="text/javascript" src="./scripts/Rodin.js"></script>
     <script type="text/javascript" src="./scripts/Rodin_Matrix32.js"></script>
     <script type="text/javascript" src="./scripts/Rodin_Vector2.js"></script>
-    <script type="text/javascript" src="./scripts/RodinTestScene.js"></script>
-</head>init_viewport
+    
+    <script type="text/javascript" src="./scripts/Rodin_Camera2d.js"></script>
+    
+    <script type="text/javascript" src="./scripts/Rodin_ToolManager.js"></script>
+    <script type="text/javascript" src="./scripts/Rodin_TraceRectangleTool.js"></script>
+    <script type="text/javascript" src="./scripts/Rodin_TestApp.js"></script>
+    <script type="text/javascript" src="./scripts/Rodin_coding.js"></script>
+    
+</head>
     
 <body>
-    <TABLE>
+    <TABLE class="main_table">
     <TR>
         <TH>
             <H3>Rodin test</H3>
@@ -28,18 +35,26 @@
         </TD>
     </TR>
     <TR>
-        <TD>
-            <INPUT id="trace_rectangle_button" type="button" value="Trace rectangle"/>
-        </TD>
-        <TD>
-        </TD>
+        <TABLE class="toolbox_table">
+            <TR>
+                <TD>
+                    <a href="#" id="trace_rectangle_button" class="trace_button">Trace rectangle</a>
+                </TD>
+                <TD>
+                    <a href="#" id="stop_current_tool_button" class="trace_button">Stop</a>
+                </TD>
+                <TD>
+                    <h4 id="mouse_position">0, 0</h4>
+                </TD>
+            </TR>
+        </TABLE>
         
     </TR>
     
     <script>
         $(document).ready(function(){
         
-            Rodin.initialize();
+            Rodin.app = new Rodin.TestApp();
         });
     </script>
 </body>

@@ -4,6 +4,8 @@ if (typeof Rodin == "undefined" || !Rodin)
 {
    var Rodin = {};
    
+   // ne fonctionne pas
+   /*
    Rodin.assert = function(test) {
    
         if (! test) {
@@ -15,5 +17,6 @@ if (typeof Rodin == "undefined" || !Rodin)
             //alert("Error, Assert failed"); 
         }
    }
+   */
    
 }
