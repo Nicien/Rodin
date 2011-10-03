@@ -1,24 +1,62 @@
 
+BODY {
+    background-color: #BBB;
+}
+
 TABLE.main_table
 {
+    background-color: #DDD;
     border-collapse:collapse;
+    width:900px;
+    margin-left:auto;
+    margin-right:auto;
 }
 
 TABLE.main_table TH {
 
+    background-color: #DDD;
+    text-align:center;
+}
+
+TABLE.main_table TH H3 {
+
+    width:150px;
+    margin-left:auto;
+    margin-right:auto;
+    
+    color: #444;
+    background-color: #EEE;
+    border-radius: 10px;
+    border:solid #444 1px;
 }
 
 TABLE.main_table TD {
 
 }
 
-CANVAS.floorplan
-{
-    border:solid thin red;
+TABLE.main_table TD.canvas_td {
+
+    padding:10px;
+}
+
+CANVAS.floorplan {
     
-    /* i'm become old ;) */
-    width:320px;
+    width:400px;
     height:200px;
+    display:block;
+    border:solid 1px grey;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+CANVAS.viewport {
+    
+    width:400px;
+    height:200px;
+    display:block;
+    border:solid 1px grey;
+    margin-left:auto;
+    margin-right:auto;
 }
 
 /* generic container (i.e. div) for floating buttons */
@@ -32,21 +70,22 @@ CANVAS.floorplan
 TABLE.toolbox_table {
 
     border-collapse:collapse;
+
+    
 }
 
 TABLE.toolbox_table TD {
 
-    border:solid 1px #6495ed;
-    width:140px;
+    height:50px;
+    width:150px;
     text-align:center;
+    
     padding:0px 10px 0px 10px;
 }
 
 a.trace_button {
 
-    width:100%;
     display: block;
-    height:25x;
     font: normal 14x arial, sans-serif;
     text-align:center;
     text-decoration:none;

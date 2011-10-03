@@ -1,62 +1,79 @@
  (function() {
 
-    // ----  
-    // Usage: 'parent_node' must be set
+    // Usage:
+    //      'parent_node' must be set
+    //      'origin_button_j' must be set
     Rodin.TraceRectangleTool = function() {
     
-        this.tracing = false;
         this.parent_node = null;
+        this.origin_button_j = null;
         
         this.target_node = null;
-        this.first_point = null;
-        this.current_point = null;
     }
     
     Rodin.TraceRectangleTool.prototype = {
     
         activate: function(mouse_event) {
             
-            $("#trace_rectangle_button").addClass("trace_button_selected");
+            this.origin_button_j.addClass("trace_button_selected");
             $("#floorplan").css('cursor', 'crosshair');
         },
         
         desactivate: function(mouse_event) {
         
+            this.origin_button_j.removeClass("trace_button_selected");
             $("#floorplan").css('cursor', '');
-            $("#trace_rectangle_button").removeClass("trace_button_selected");
         },
         
         mouse_down: function(mouse_event) {
         
-            $("#mouse_position").html(mouse_event.viewport_position.x + ', ' + mouse_event.viewport_position.y);
+            this._update_cursor_position(mouse_event);
             
             this.target_node = this.parent_node.add_child();
+            this.target_node.visible = false;
             
-            this.first_point = this.target_node.vertices.add_move_to(mouse_event.viewport_position.x, mouse_event.viewport_position.y);
+            var vertices_storage = this.target_node.vertices_storage;
+            var f = vertices_storage.move_to(mouse_event.viewport_position);
+            vertices_storage.line_to(f.x, 0);
+            vertices_storage.line_to(0, 0);
+            vertices_storage.line_to(0, f.y);
             
-            this.current_point = this.target_node.vertices.add_line_to(mouse_event.viewport_position.x, mouse_event.viewport_position.y);
+            vertices_storage.close_path();
+            //vertices_storage.line_to(f);
         },
         
         mouse_move: function(mouse_event) {
         
-            $("#mouse_position").html(mouse_event.viewport_position.x + ', ' + mouse_event.viewport_position.y);
+            this._update_cursor_position(mouse_event);
             
-            if (this.target_node != null && this.current_point != null) {
+            if (this.target_node != null) {
             
-                this.current_point.x = mouse_event.viewport_position.x;
-                this.current_point.y = mouse_event.viewport_position.y;
+                this.target_node.visible = true;
+                
+                var vertices = this.target_node.vertices_storage.vertices;
+                
+                vertices[1].y = mouse_event.viewport_position.y;
+                
+                vertices[2].x = mouse_event.viewport_position.x;
+                vertices[2].y = mouse_event.viewport_position.y;
+                
+                vertices[3].x = mouse_event.viewport_position.x;
             }
+            
         },
         
         mouse_up: function(mouse_event) {
         
-            $("#mouse_position").html(mouse_event.viewport_position.x + ', ' + mouse_event.viewport_position.y);
+            this._update_cursor_position(mouse_event);
             
-            this.target_node.vertices.add_line_to(this.first_point.x, this.first_point.y);
-            this.first_point = null;
-            this.current_point = null;
             this.target_node = null;
+        },
+        
+        _update_cursor_position: function(mouse_event) {
+        
+            $("#mouse_position").html(Math.round(mouse_event.viewport_position.x) + ', ' + Math.round(mouse_event.viewport_position.y));
         }
+        
     }
     
 })()

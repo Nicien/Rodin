@@ -2,11 +2,11 @@
 (function () {
     
     // ------ Vertex2Cmd
-    Rodin.Vertex2Cmd = function(x, y, cmd) {
+    Rodin.Vertex2Cmd = function(cmd, x, y) {
     
+        this.cmd = cmd;
         this.x = x;
         this.y = y;
-        this.cmd = cmd;
     }
     
     // ------ Rodin
@@ -22,18 +22,31 @@
             return this.vertices.length == 0;
         },
         
-        add_move_to: function(x, y) {
+        add: function(cmd, x_or_v2, y) {
         
-            var vertex_cmd = new Rodin.Vertex2Cmd(x, y, Rodin.VerticesStorage.move_to);
+            var vertex_cmd =
+                //(x instanceof Rodin.Vector2) ?
+                (y === undefined) ?
+                new Rodin.Vertex2Cmd(cmd, x_or_v2.x, x_or_v2.y) :
+                new Rodin.Vertex2Cmd(cmd, x_or_v2, y);
+            
             this.vertices.push(vertex_cmd);
             return vertex_cmd;
         },
         
-        add_line_to: function(x, y) {
+        move_to: function(x_or_v2, y) {
+            
+            return this.add(Rodin.VerticesStorage.command.move_to, x_or_v2, y);
+        },
         
-            var vertex_cmd = new Rodin.Vertex2Cmd(x, y, Rodin.VerticesStorage.line_to)
-            this.vertices.push(vertex_cmd);
-            return vertex_cmd;
+        line_to: function(x_or_v2, y) {
+            
+            return this.add(Rodin.VerticesStorage.command.line_to, x_or_v2, y);
+        },
+        
+        close_path: function() {
+        
+            return this.add(Rodin.VerticesStorage.command.close_path, 0, 0);
         },
         
         add_path_to_context: function(context) {
@@ -45,29 +58,40 @@
             for (var index = 0; index != size; ++index) {
             
                 vertex_cmd = this.vertices[index];
-                if (vertex_cmd.cmd == Rodin.VerticesStorage.line_to) { // there is more line_to than move_to
+                if (vertex_cmd.cmd == Rodin.VerticesStorage.command.line_to) { // there is more line_to than move_to
                 
                     context.lineTo(vertex_cmd.x, vertex_cmd.y);
+                    //context.lineTo(Math.round(vertex_cmd.x)+0.5, Math.round(vertex_cmd.y)+0.5);
                 }
-                else if (vertex_cmd.cmd == Rodin.VerticesStorage.move_to) {
+                else if (vertex_cmd.cmd == Rodin.VerticesStorage.command.move_to) {
                 
                     context.moveTo(vertex_cmd.x, vertex_cmd.y);
+                    //context.moveTo(Math.round(vertex_cmd.x)+0.5, Math.round(vertex_cmd.y)+0.5);
+                }
+                else if (vertex_cmd.cmd == Rodin.VerticesStorage.command.close_path) {
+                
+                    context.closePath();
                 }
             }
         }
         
     }
     
-    Rodin.VerticesStorage.move_to = 0;
-    Rodin.VerticesStorage.line_to = 1;
+    Rodin.VerticesStorage.command = {
+    
+        move_to     : 0,
+        line_to     : 1,
+        close_path  : 2
+    }
+
     
     // ------ Node
     Rodin.Node = function() {
     
         this.transform = Rodin.Matrix32.create_identity();
-        this.vertices = new Rodin.VerticesStorage();
-        
+        this.vertices_storage = new Rodin.VerticesStorage();
         this.children = [];
+        this.visible = true;
     }
     
     Rodin.Node.prototype = {
@@ -81,15 +105,19 @@
         
         draw: function(context) {
         
-            if (! this.vertices.is_empty()) {
+            if (this.visible && ! this.vertices_storage.is_empty()) {
             
-                //context.save();
+                context.save();
                 
-                this.vertices.add_path_to_context(context);
-                context.strokeStyle = "blue";
+                this.vertices_storage.add_path_to_context(context);
+                
+                //context.globalAlpha = 0.5;
+                //context.fill();
+                
+                //context.globalAlpha = 1.0;
                 context.stroke();
                 
-                //context.restore();
+                context.restore();
             }
 
             // draw children:
@@ -103,7 +131,7 @@
     
     // ------ Scene
     Rodin.Scene = function() {
-    
+        
         this.root = new Rodin.Node();
     }
     
@@ -111,9 +139,11 @@
     
         draw: function(context, viewport_size) {
             
-            context.fillStyle = "#CCC";
+            context.fillStyle = "#fff";
             context.fillRect(0, 0, viewport_size.x, viewport_size.y);
             
+            context.fillStyle = "#33a";
+            context.strokeStyle = "#444";
             this.root.draw(context);
         }
     }
