@@ -22,7 +22,7 @@
         this.camera = new Rodin.Camera2d();
         
         this.tool_manager = new Rodin.ToolManager();
-        this.tool_manager.j_canvas = $("floorplan");
+        this.tool_manager.j_canvas = $("#floorplan");
         
         this.scene = new Rodin.Scene();
         
@@ -149,23 +149,22 @@
             this.shader_program = new Rodin.WebGlShader
             (
                 this.gl_renderer.gl,
-                document.getElementById("vertex_shader").innerText,
-                document.getElementById("frament_shader_red").innerText
+                document.getElementById("vertex_shader").text,
+                document.getElementById("frament_shader_red").text
             );
             
-            // buffers            
-            
-            var vertices = [
+            var vertices = new Float32Array( [
                 1.0,  1.0,  0.0,
                 -1.0, 1.0,  0.0,
                 1.0,  -1.0, 0.0,
                 -1.0, -1.0, 0.0
-            ];
-  
-            this.squareVertexPositionBuffer = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVertexPositionBuffer);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+            ] );
             
+            this.square_vertices = new Rodin.WebGlVertices(gl, vertices);
+            
+            this.square_transform = M4x4.clone(M4x4.identity);
+            //this.camera_transform = M4x4.makeOrtho2D(0, this.gl_renderer.viewport_width, 0, this.gl_renderer.viewport_height);
+            this.camera_transform = M4x4.makeOrtho2D(-10, 10, -10, 10);
         },
         
         
@@ -175,7 +174,9 @@
             var gl = this.gl_renderer.gl;
             //gl.useProgram(this.shader_program);
             
-            //perspectiveMatrix = makePerspective(45, 640.0/480.0, 0.1, 100.0);  
+            //perspectiveMatrix = makePerspective(45, 640.0/480.0, 0.1, 100.0);
+            
+            this.shader_program.draw(this.square_vertices, this.camera_transform, this.square_transform);
         }
         
     }
