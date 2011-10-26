@@ -7,14 +7,17 @@
     
     <link rel="stylesheet" type="text/css" href="rodin_test.css"/>
     <script type="text/javascript" src="./scripts/jquery-1.6.4.min.js"></script>
-    <script type="text/javascript" src="./scripts/mjs.js"></script>
+    <!-- <script type="text/javascript" src="./scripts/poly2tri.js"></script> -->
     
     <script type="text/javascript" src="./scripts/Rodin.js"></script>
-    <script type="text/javascript" src="./scripts/Rodin_Matrix32.js"></script>
-    <script type="text/javascript" src="./scripts/Rodin_Vector2.js"></script>
+    <script type="text/javascript" src="./scripts/Rodin_Vector_And_Matrix.js"></script>
     
     <script type="text/javascript" src="./scripts/Rodin_WebGlRenderer.js"></script>
     <script type="text/javascript" src="./scripts/Rodin_WebGlShader.js"></script>
+	
+    <script type="text/javascript" src="./scripts/Rodin_Camera3d.js"></script>
+    <script type="text/javascript" src="./scripts/Rodin_Scene3d.js"></script>
+    <script type="text/javascript" src="./scripts/Rodin_Node3d.js"></script>
     
     <script type="text/javascript" src="./scripts/Rodin_Camera2d.js"></script>
     
@@ -24,22 +27,26 @@
     
     <script type="text/javascript" src="./scripts/Rodin_TestApp.js"></script>
     <script type="text/javascript" src="./scripts/Rodin_coding.js"></script>
-    
-    
-    <script id="vertex_shader" type="x-shader/x-vertex">
-        attribute vec3 aVertexPosition;
-
-        uniform mat4 uMVMatrix;
-        uniform mat4 uPMatrix;
+	
+	<script id="vertex_shader_projection" type="x-shader/x-vertex">
+        attribute vec3 a_vertex_position;
+		
+        uniform mat4 u_transform;
   
         void main(void) {
-            gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+            gl_Position = u_transform * vec4(a_vertex_position, 1.0);
         }
     </script>
     
-    <script id="frament_shader_red" type="x-shader/x-fragment">  
+    <script id="frament_shader_plain_color" type="x-shader/x-fragment">  
+		#ifdef GL_ES
+		precision highp float;
+		#endif
+		
+		uniform vec3 u_plain_color;
+		
         void main(void) {  
-            gl_FragColor = vec4(1.0, 0.5, 0.5, 1.0);  
+            gl_FragColor = vec4(u_plain_color, 1.0);  
         }
     </script>
 

@@ -5,18 +5,17 @@ if (typeof Rodin == "undefined" || !Rodin)
    var Rodin = {};
    
    // ne fonctionne pas
-   /*
-   Rodin.assert = function(test) {
    
-        if (! test) {
+   Rodin.assert = function(test, message) {
+   
+        if (test == false) {
         
             if (window.console && window.console.error) {
                 console.error(arguments);
             }
-            throw "Error, Assert failed";
-            //alert("Error, Assert failed"); 
+            //throw "Error, Assert failed";
+            alert("Assert failed: " + message); 
         }
    }
-   */
    
 }

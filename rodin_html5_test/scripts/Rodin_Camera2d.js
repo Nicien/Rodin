@@ -13,10 +13,10 @@
     
         transform: function(viewport_size_v2) {
         
-            result = Matrix32.create_identity();
-            result.multiply(Matrix32.create_translation(viewport_size_v2.x, viewport_size_v2.y));
-            result.multiply(Matrix32.create_scaling(zoom, zoom));
-            result.multiply(Matrix32.create_translation(this.translate.x, this.translate.y));
+            result = Mat3x2.create_identity();
+            result.multiply(Mat3x2.create_translation(viewport_size_v2.x, viewport_size_v2.y));
+            result.multiply(Mat3x2.create_scaling(zoom, zoom));
+            result.multiply(Mat3x2.create_translation(this.translate.x, this.translate.y));
             return result;
         }
     }

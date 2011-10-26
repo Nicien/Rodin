@@ -88,7 +88,7 @@
     // ------ Node
     Rodin.Node = function() {
     
-        this.transform = Rodin.Matrix32.create_identity();
+        this.transform = Rodin.Mat3x2.make_identity();
         this.vertices_storage = new Rodin.VerticesStorage();
         this.children = [];
         this.visible = true;
