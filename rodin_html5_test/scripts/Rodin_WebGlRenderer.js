@@ -3,7 +3,6 @@
 
     Rodin.WebGlRenderer = function() {
     
-        this.gl = null;
         this.viewport_width = 0;
         this.viewport_height = 0;
     }
@@ -12,6 +11,8 @@
     
         init: function(canvas) {
             
+			Rodin.assert(Rodin.gl == null);
+			
             // create gl context:
             if (this._try_create_webgl_context(canvas, "webgl") == false) {
             
@@ -23,9 +24,9 @@
             
             this.update_viewport();
             
-            this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
-            //this.gl.enable(this.gl.DEPTH_TEST);
-            this.gl.disable(this.gl.DEPTH_TEST);
+            Rodin.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+            //Rodin.gl.enable(Rodin.gl.DEPTH_TEST);
+            Rodin.gl.disable(Rodin.gl.DEPTH_TEST);
 
             return true;
         },
@@ -33,14 +34,14 @@
         _try_create_webgl_context: function(canvas, context_name) {
         
             try {
-                this.gl = canvas.getContext(context_name);
-                //this.gl = canvas.getContext("webgl", { antialias: false, stencil: true });
+                Rodin.gl = canvas.getContext(context_name);
+                //Rodin.gl = canvas.getContext("webgl", { antialias: false, stencil: true });
                 
             } catch (e) {
             
             }
             
-            return this.gl != null;
+            return Rodin.gl != null;
         },
         
         update_viewport: function() {
@@ -48,19 +49,19 @@
             // compatibility fix:
             // Sur la version 7.01 de firefox, drawingBufferWidth/Height n'existe pas encore.
             // ca arrive: https://bugzilla.mozilla.org/show_bug.cgi?id=658856
-            if (this.gl.drawingBufferWidth == undefined) {
+            if (Rodin.gl.drawingBufferWidth == undefined) {
             
-                this.gl.drawingBufferWidth = this.gl.canvas.width;
-                this.gl.drawingBufferHeight = this.gl.canvas.height;
+                Rodin.gl.drawingBufferWidth = Rodin.gl.canvas.width;
+                Rodin.gl.drawingBufferHeight = Rodin.gl.canvas.height;
             }
             
             // detect if canvas size has changed
-            if (this.viewport_width != this.gl.drawingBufferWidth && this.viewport_height != this.gl.drawingBufferHeight) {
+            if (this.viewport_width != Rodin.gl.drawingBufferWidth && this.viewport_height != Rodin.gl.drawingBufferHeight) {
             
-                this.viewport_width = this.gl.canvas.width;
-                this.viewport_height = this.gl.canvas.height;
+                this.viewport_width = Rodin.gl.canvas.width;
+                this.viewport_height = Rodin.gl.canvas.height;
 
-                this.gl.viewport(0, 0, this.viewport_width, this.viewport_height);
+                Rodin.gl.viewport(0, 0, this.viewport_width, this.viewport_height);
             }
         },
         
@@ -68,7 +69,7 @@
         
             // canvas size may change
             this.update_viewport();
-            this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+            Rodin.gl.clear(Rodin.gl.COLOR_BUFFER_BIT | Rodin.gl.DEPTH_BUFFER_BIT);
         }
         
     }

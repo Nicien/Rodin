@@ -2,11 +2,14 @@
 // Rodin namespace
 if (typeof Rodin == "undefined" || !Rodin)
 {
-   var Rodin = {};
+	var Rodin = {
+	
+		gl : null
+	};
+	
+	// ne fonctionne pas
    
-   // ne fonctionne pas
-   
-   Rodin.assert = function(test, message) {
+	Rodin.assert = function(test, message) {
    
         if (test == false) {
         
