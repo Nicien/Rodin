@@ -15,10 +15,19 @@
     
     Rodin.Scene3d.prototype = {
     
-        draw : function(context) {
+        draw : function(renderer, context) {
             
-			this.root.draw(context);
-        }
+			context.renderer = renderer;
+			renderer.prepare_rendering();
+			this.root.for_each_node(this, context);
+        },
+		
+		// scene act as a renderer for now
+		process_node_content : function(context, content3d, absolute_transform) {
+		
+			// TODO: scene_transform * node_transform
+			content3d.shader.draw(content3d.mesh, context.camera_transform, content3d.shader_parameters);
+		}
         
     }
 	
@@ -32,20 +41,18 @@
 		this.shader_parameters = null;
 	}
 	
-	Rodin.Content3d.prototype = {
-
-		draw : function(context, node_transform) {
-			
-			// TODO: scene_transform * node_transform
-			this.shader.draw(this.mesh, context.camera_transform, this.shader_parameters);
-		}
-		
-	}
-	
 	// ---------------------
 		
     Rodin.Mesh3d = function() {
 	
+		// optional, if 'indices' is null gl.drawArrays is used, else gl.drawElements
+		this.indices = null;  // Rodin.WebGlIndices
+		
+		// optional, if sub_mesh is null, the entire buffer is drawn.
+		// Else use this format: [ {first:0, count:10}, {first:0, count:5} ];
+		this.sub_mesh = null;
+		
+		
 		this.vertices = null; // Rodin.WebGlVertices
 		this.normals = null;  // Rodin.WebGlVertices
 		this.uv = null;		  // Rodin.WebGlVertices

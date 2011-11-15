@@ -70,8 +70,8 @@ CANVAS.viewport {
 TABLE.toolbox_table {
 
     border-collapse:collapse;
-
     
+    border:solid #444 1px;
 }
 
 TABLE.toolbox_table TD {

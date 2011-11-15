@@ -25,8 +25,8 @@
             this.update_viewport();
             
             Rodin.gl.clearColor(0.0, 0.0, 0.0, 1.0);
-            //Rodin.gl.enable(Rodin.gl.DEPTH_TEST);
-            Rodin.gl.disable(Rodin.gl.DEPTH_TEST);
+            Rodin.gl.enable(Rodin.gl.DEPTH_TEST);
+            //Rodin.gl.disable(Rodin.gl.DEPTH_TEST);
 
             return true;
         },

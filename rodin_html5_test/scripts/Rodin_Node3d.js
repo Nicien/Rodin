@@ -84,19 +84,19 @@
 			}
 		},
 		
-        draw : function(context) {
+        for_each_node : function(content_manipulator, context) {
 		
 			var content_count = this.content_array.length;
 			for (var content_index = 0; content_index != content_count; ++content_index) {
 				
-				this.content_array[content_index].draw(context, this.absolute_transform);
+				content_manipulator.process_node_content(context, this.content_array[content_index], this.absolute_transform);
 			}
 			
 			// draw children:
 			var children_count = this.children.length;
 			for (var children_index = 0; children_index != children_count; ++children_index) {
 			
-				this.children[children_index].draw(context);
+				this.children[children_index].for_each_node(content_manipulator, context);
 			}
         }
         

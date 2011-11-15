@@ -12,27 +12,6 @@
     
     Rodin.GridGenerator.prototype = {
 		
-		// convert Array of Rodin.Vector3 into a Float32Array:
-		vector3_array_to_float32_array : function(array_of_vector3) {
-		
-			var vertices_count = array_of_vector3.length;
-			var float_array = new Float32Array(vertices_count * 3);
-			
-			// todo fill float_array
-			var each_vertex = null;
-			var float_index = 0;
-			for (vertex_index = 0; vertex_index != vertices_count; ++vertex_index) {
-			
-				each_vertex = array_of_vector3[vertex_index];
-				
-				float_array[float_index++] = each_vertex.x;
-				float_array[float_index++] = each_vertex.y;
-				float_array[float_index++] = each_vertex.z;
-			}
-			
-			return float_array;
-		},
-		
 		// generate
         generate_mesh : function(test_scene_materials, node) {
 			
@@ -51,15 +30,12 @@
 			
 				for (vertex_index_x = 0; vertex_index_x != vertex_count_x; ++vertex_index_x) {
 				
-					vertices.push(new Rodin.Vector3 (
-						vertex_index_x*this.cell_size + offset_x,
-						-2,
-						vertex_index_y*this.cell_size +offset_y
-					) );
+					vertices.push(vertex_index_x * this.cell_size + offset_x);
+					vertices.push(0);
+					vertices.push(vertex_index_y * this.cell_size + offset_y);
 				}
 			}
 			
-			// TEMPORARY:
 			var indexes_a = new Array();
 			var indexes_b = new Array();
 			
@@ -67,6 +43,7 @@
 			var v00, v01, v10, v11 = +1;
 			
 			
+			var indexes = null;
 			var line_first_cell_color = false;
 			for (cell_y_index = 0; cell_y_index != this.nb_cell_y; ++cell_y_index) {
 			
@@ -86,13 +63,13 @@
 					var indexes = (cell_color) ? indexes_a : indexes_b;
 					
 					// for now
-					indexes.push(vertices[v00]);
-					indexes.push(vertices[v01]);
-					indexes.push(vertices[v10]);
+					indexes.push(v00);
+					indexes.push(v01);
+					indexes.push(v10);
 					
-					indexes.push(vertices[v10]);
-					indexes.push(vertices[v01]);
-					indexes.push(vertices[v11]);
+					indexes.push(v10);
+					indexes.push(v01);
+					indexes.push(v11);
 				}
 			}
 			
@@ -101,7 +78,7 @@
 			var grid_content_b = new Rodin.Content3d();
 			
 			node.add_content(grid_content_a);
-			node.add_content(grid_content_b);
+			//node.add_content(grid_content_b);
 
 			grid_content_a.shader = test_scene_materials.grid_shader;
 			grid_content_b.shader = test_scene_materials.grid_shader;
@@ -112,8 +89,17 @@
 			grid_content_a.mesh = new Rodin.Mesh3d();
 			grid_content_b.mesh = new Rodin.Mesh3d();
 			
-			grid_content_a.mesh.vertices = new Rodin.WebGlVertices(this.vector3_array_to_float32_array(indexes_a) );
-			grid_content_b.mesh.vertices = new Rodin.WebGlVertices(this.vector3_array_to_float32_array(indexes_b) );
+			// note: vertice buffer is shared
+			var webgl_vertices =  new Rodin.WebGlVertices( new Float32Array(vertices) );
+			grid_content_a.mesh.vertices = webgl_vertices;
+			grid_content_a.mesh.indices = new Rodin.WebGlIndices( new Uint16Array(indexes_a) );
+			
+			grid_content_b.mesh.vertices = webgl_vertices;
+			grid_content_b.mesh.indices = new Rodin.WebGlIndices( new Uint16Array(indexes_b) );
+			
+			var indices = grid_content_a
+			[ {first:0, count:10}, {first:0, count:5} ];
+			
         },
         
     }

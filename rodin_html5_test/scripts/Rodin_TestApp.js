@@ -32,10 +32,6 @@
         // initialize shaders:
         this.shaders = new Rodin.Shaders();
         this.shaders.load_all_shaders();
-                    
-        this.camera_viewport = new Rodin.Camera3d();
-        this.camera_viewport.eye.set(0, 0, -10);
-        this.camera_viewport.center.set(0, 0, 1);
 
         // init 2d canvas
         this.canvas = document.getElementById("floorplan");
@@ -55,7 +51,7 @@
         this.tool_manager.j_canvas = $("#floorplan");
         
         
-
+		this.camera_mgr = new Rodin.CameraMgr();
         
         var app = this;
         
@@ -116,7 +112,28 @@
             app.tool_manager.set_current_tool(null);
             event.preventDefault();
         });
+		        
+        $("#front_camera").click( function(event) {
         
+			app.camera_mgr.set_camera_mode_front();
+			app.refresh_viewport();
+            event.preventDefault();
+        });
+		
+		$("#orbit_camera").click( function(event) {
+        
+			app.camera_mgr.set_camera_mode_orbit();
+			app.refresh_viewport();
+            event.preventDefault();
+        });
+		
+        $("#animate_camera").click( function(event) {
+        
+			app.camera_mgr.set_animate_camera( ! app.camera_mgr.animate_camera);
+            event.preventDefault();
+        });
+        
+		
         // fill 2d scene:
         var n = this.scene.root.add_child();
         n.vertices_storage.move_to(10, 1);
@@ -194,7 +211,10 @@
             
                 var time_delta = current_time - this.last_update_time;			
 				
-				this.update_camera_positon(time_delta);
+				if (this.camera_mgr.update_camera_positon(time_delta)) {
+				
+					this.refresh_viewport();
+				}
 				
 				if (this.need_refresh_canvas) {
 					
@@ -209,33 +229,16 @@
 				
 					this.need_refresh_viewport = false;
 					
-					this.gl_renderer.prepare_rendering();
-					
-					var camera_transform = this.camera_viewport.get_transform(this.gl_renderer.viewport_width, this.gl_renderer.viewport_height);
+					var camera_transform = this.camera_mgr.current_camera.get_transform(this.gl_renderer.viewport_width, this.gl_renderer.viewport_height);
 					//this.shader_program.draw(this.square_vertices, camera_transform, this.square_transform);
 					
 					var context = { camera_transform:camera_transform };
-					this.scene3d.draw(context);
+					this.scene3d.draw(this.gl_renderer, context);
 				}
             }
             
             this.last_update_time = current_time;
-        },
-		
-		update_camera_positon : function(time_delta) {
-			
-			if (this.camera_pos == undefined) { 
-				this.camera_pos = 0;
-			}
-			
-			// update camera:
-			var camera_speed = 1 * 0.001;
-			this.camera_pos -= camera_speed * time_delta;
-			this.camera_viewport.eye.set(0, 0, this.camera_pos);
-			this.camera_viewport.center.set(0, 0, 1);
-					
-			this.refresh_viewport();
-		}
+        }
 
         
     }

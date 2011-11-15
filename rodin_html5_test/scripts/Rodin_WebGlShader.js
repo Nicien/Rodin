@@ -98,35 +98,26 @@
 		draw: function(mesh, projection_mat4x4, color) {
 			
 			var gl = Rodin.gl;
-			gl.bindBuffer(gl.ARRAY_BUFFER, mesh.vertices.buffer);
 			
-			gl.vertexAttribPointer(this.attribute_vertex_position_index, 3, gl.FLOAT, false, 0, 0);
-			
+			// set vertex shader parameters:
 			gl.uniformMatrix4fv(this.uniform_transform_index, false, projection_mat4x4.buffer);
 			gl.uniform3f(this.uniform_plain_color, color.r, color.g, color.b);
 			
-			// render !
-			gl.drawArrays(mesh.vertices_type, 0, mesh.vertices.length / 3);
+			// bind vertex buffer:
+			gl.bindBuffer(gl.ARRAY_BUFFER, mesh.vertices.buffer);
+			gl.vertexAttribPointer(this.attribute_vertex_position_index, 3, gl.FLOAT, false, 0, 0);
+			
+			if (mesh.indices == null) {
+			
+				gl.drawArrays(mesh.vertices_type, 0, mesh.vertices.length / 3);	
+			}
+			else {
+			
+				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.indices.buffer);
+				gl.drawElements(mesh.vertices_type, mesh.indices.length, gl.UNSIGNED_SHORT, 0);
+			}
 		}
 	}
-	
-	
-	
-	// ---------------------------- WebGlVertices
-	
-	// vertices must be a Float32Array
-    Rodin.WebGlVertices = function(vertices) {
-        
-        this.length = vertices.length;
-        
-        this.buffer = Rodin.gl.createBuffer();
-        Rodin.gl.bindBuffer(Rodin.gl.ARRAY_BUFFER, this.buffer);
-        Rodin.gl.bufferData(Rodin.gl.ARRAY_BUFFER, vertices, Rodin.gl.STATIC_DRAW);
-    }
-    
-    Rodin.WebGlVertices.prototype = {
-    
-    }
 	
 })()
 
