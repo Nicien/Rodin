@@ -1,9 +1,9 @@
 
-BODY {
+body {
     background-color: #BBB;
 }
 
-TABLE.main_table
+table.main_table
 {
     background-color: #DDD;
     border-collapse:collapse;
@@ -12,13 +12,13 @@ TABLE.main_table
     margin-right:auto;
 }
 
-TABLE.main_table TH {
+table.main_table TH {
 
     background-color: #DDD;
     text-align:center;
 }
 
-TABLE.main_table TH H3 {
+table.main_table TH H3 {
 
     width:150px;
     margin-left:auto;
@@ -30,16 +30,16 @@ TABLE.main_table TH H3 {
     border:solid #444 1px;
 }
 
-TABLE.main_table TD {
+table.main_table TD {
 
 }
 
-TABLE.main_table TD.canvas_td {
+table.main_table TD.canvas_td {
 
     padding:10px;
 }
 
-CANVAS.floorplan {
+canvas.floorplan {
     
     width:400px;
     height:200px;
@@ -49,7 +49,7 @@ CANVAS.floorplan {
     margin-right:auto;
 }
 
-CANVAS.viewport {
+canvas.viewport {
     
     width:400px;
     height:200px;
@@ -67,14 +67,14 @@ CANVAS.viewport {
 }
 */
 
-TABLE.toolbox_table {
+table.toolbox_table {
 
     border-collapse:collapse;
     
     border:solid #444 1px;
 }
 
-TABLE.toolbox_table TD {
+table.toolbox_table TD {
 
     height:50px;
     width:150px;
@@ -86,7 +86,7 @@ TABLE.toolbox_table TD {
 a.trace_button {
 
     display: block;
-    font: normal 14x arial, sans-serif;
+    font: normal 14x arial sans-serif;
     text-align:center;
     text-decoration:none;
 
@@ -108,5 +108,6 @@ a.trace_button:active {
     background-color: #AAA;
     outline: none; /* hide dotted outline in Firefox */
 }
+
 
 
