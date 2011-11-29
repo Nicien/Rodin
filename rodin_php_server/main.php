@@ -5,7 +5,7 @@ define('WWW', '../www');
 define('OBJ_DATABASE_DIRECTORY', WWW.'/obj_database');
 define('JS_DATABASE_DIRECTORY', WWW.'/js_database');
 
-require_once("ObjLoader.php");
+require_once('WavefrontObjLoader.php');
 
 function dump($var) {
 
@@ -19,10 +19,18 @@ function message($msg) {
 	echo '<P>'.$msg.'</P>';
 }
 
+function error($msg) {
+
+	echo '<P>ERROR: '.$msg.'</P>';
+	die();
+}
+
+
 function process_query_uri() {
 
 	$uri = explode('/', $_SERVER['REQUEST_URI']);
 	$parameters = array();
+	
 	foreach($uri as $uri_component) {
 	
 		if (! empty($uri_component)) {
@@ -39,6 +47,19 @@ function process_query_uri() {
 			}
 			*/
 
+		}		
+	}
+
+	// remove parameter part:
+	if (count($parameters) != 0) {
+	
+		$last_index = count($parameters) - 1;
+		$last = $parameters[$last_index];
+		
+		$uri_param_index = strpos($last, '?');
+		if ($uri_param_index !== false) {
+		
+			$parameters[$last_index] = substr($last, 0, $uri_param_index);
 		}
 		
 	}
@@ -46,45 +67,15 @@ function process_query_uri() {
 	return $parameters;
 }
 
-/*
-function is_parameter_true($param_name) {
+function render_json($data) {
 
-	return empty($_GET[$param_name]) == false && $_GET[$param_name];
-}
-
-function get_parameter($param_name,  &$param_out) {
-
-	$param_exists = empty($_GET[$param_name]) == false;
-	if ($param_exists) {
-		
-		$param_out = $_GET[$param_name];
-	}
-	return $param_exists;
-}
-
-if (is_parameter_true('obj_as_json')) {
-
-}
-
-// localhost:8080/?obj_name=ahstray
-if (get_parameter('obj_name', $obj_name)) {
-
-}
-*/
-
-function obj_as_json() {
-
-	$obj_loader = new ObjLoader();
-	//$obj_loader->load(OBJ_DATABASE_DIRECTORY.'/dchair_obj.obj');
-	$obj_loader->load(OBJ_DATABASE_DIRECTORY.'/ahstray.obj');
+	// JSON_FORCE_OBJECT is available since php 5.3
+	if (empty($data)) $data = (object) null;
 	
-	$obj_loader->unpackForGL();
-	$obj_loader->writeUnpackedToJson(JS_DATABASE_DIRECTORY.'/ahstray.js');
+    header('Content-Type: text/javascript; charset=utf8');
 	
-	//message(count($obj_loader->m_verts).' vertices');
-	//message(count($obj_loader->m_indices).' indices');
-	
-	message('Done.');
+	echo json_encode($data);	
+	die();
 }
 
 function main() {
@@ -93,9 +84,41 @@ function main() {
 	if (empty($parameters) == false) {
 	
 	
-		if ($parameters[0] == 'obj_as_json') {
+		if ($parameters[0] == 'available_objects') {
+			
+			$js_object_listing = array();
+			
+			$js_dir_content = scandir(JS_DATABASE_DIRECTORY);
+			foreach ($js_dir_content as $each_js_object) {
+			
+				if (empty($each_js_object) || $each_js_object[0] == '.') continue;
+				$path_infos = pathinfo($each_js_object);
+				if ($path_infos['extension'] == 'js') {
+				
+					$js_object_listing[] = $path_infos['filename'];
+				}
+			}
+			
+			render_json($js_object_listing);
+		}
+		else if ($parameters[0] == 'process_obj') {
 		
-			obj_as_json();
+			// test: http://localhost:8080/process_obj/ahstray
+			if (empty($parameters[1])) error("error: missing obj parameter");
+			
+			$obj_name = $parameters[1];
+			$obj_filepath = OBJ_DATABASE_DIRECTORY."/$obj_name.obj";
+			
+			if (! file_exists($obj_filepath)) {
+			
+				error("error: can't find $obj_filepath");
+			}
+			
+			$loader = new WavefrontObjLoader();
+			$loader->parse($obj_filepath, $obj_name);
+			$loader->log();
+			$loader->save_js(JS_DATABASE_DIRECTORY."/$obj_name.js");
+			
 		}
 		else if ($parameters[0] == 'obj_name' && empty($parameters[1]) == false) {
 		
@@ -156,12 +179,16 @@ main();
     <script type="text/javascript" src="./rodin_js/Rodin_ToolManager.js"></script>
     <script type="text/javascript" src="./rodin_js/Rodin_TraceRectangleTool.js"></script>
     <script type="text/javascript" src="./rodin_js/Rodin_TraceLineTool.js"></script>
-    
-    <script type="text/javascript" src="./rodin_js/Rodin_TestApp.js"></script>
-    <script type="text/javascript" src="./rodin_js/Rodin_coding.js"></script>
-	
+    	
     <script type="text/javascript" src="./rodin_js/test_scene/Rodin_TestSceneMaterials.js"></script>
     <script type="text/javascript" src="./rodin_js/test_scene/Rodin_GridGenerator.js"></script>
+	
+    <script type="text/javascript" src="./rodin_js/Rodin_TestApp.js"></script>
+    <script type="text/javascript" src="./rodin_js/Rodin_Object3dLoader.js"></script>
+	
+    <script type="text/javascript" src="./rodin_js/Rodin_coding.js"></script>
+
+	
 	
 	<script id="vertex_shader_projection" type="x-shader/x-vertex">
 		#ifdef GL_ES
@@ -227,7 +254,7 @@ main();
 
 		varying vec2 v_texcoord;
 		varying vec3 v_normal;
-
+	
 		void main(void) {
 			// Simple, soft directional lighting.
 			//vec3 fetch = texture2D(u_diffuse_sampler, v_texcoord).rgb;
@@ -283,7 +310,9 @@ main();
 		
     </TR>
     </TABLE>
-    
+	
+    <ul id="available_objects_li"></ul>
+	
 	<div class="log"></div>
 	
     <script>
@@ -295,57 +324,6 @@ main();
 			  if (settings.dataType=='script') {
 				$(this).text( "Triggered ajaxError handler."+e );
 			  }
-			});
-			
-			var on_mesh_download_success = function(data, textStatus, jqXHR) {
-			
-				if (ajax_error !== false) {
-				
-					$( "div.log" ).text("server return error: "+ajax_error);
-					return;
-				}
-				
-				//console.log(data); //data returned
-				//console.log(textStatus); //success
-				
-				console.log('vertices length = '+vertices.length);
-				console.log('normals normals = '+normals.length);
-				console.log('textureCoords length = '+textureCoords.length);
-				
-				// build a mesh:
-				var content3d = new Rodin.Content3d();
-				content3d.mesh = new Rodin.Mesh3d();
-				//content3d.mesh.vertices_type = Rodin.gl.TRIANGLE_STRIP;
-				
-				var float32_array_vertices = new Float32Array(vertices);
-				var c = vertices.length;
-				for (var ii = 0; ii != c; ++ii) {
-				
-					float32_array_vertices[ii] /= 3.0;
-				}
-				
-				content3d.mesh.vertices = new Rodin.WebGlVertices(float32_array_vertices);
-				content3d.mesh.normals = new Rodin.WebGlVertices(new Float32Array(normals));
-				content3d.mesh.uv = new Rodin.WebGlVertices(new Float32Array(textureCoords));
-				
-				content3d.shader = Rodin.app.shaders.soft_directional_lighting;
-				content3d.shader_parameters = { r:0.5, g:0.2, b:0.3, a:1.0 };
-				
-				Rodin.app.scene3d.root.add_content(content3d);
-				Rodin.app.refresh_viewport();
-			}
-			
-			var on_mesh_download_error = function(jqXHR, textStatus, errorThrown) {
-			
-				$( "div.log" ).text("ajax error: "+textStatus+' '+errorThrown);
-			}
-			
-			$.ajax({
-				url: '/obj_name/ahstray',
-				context: document.body,
-				cache  : true,
-				success: on_mesh_download_success,
-				error  : on_mesh_download_error
 			});
 			
         });

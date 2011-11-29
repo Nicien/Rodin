@@ -132,7 +132,6 @@
 			app.camera_mgr.set_animate_camera( ! app.camera_mgr.animate_camera);
             event.preventDefault();
         });
-        
 		
         // fill 2d scene:
         var n = this.scene.root.add_child();
@@ -163,7 +162,7 @@
         content3d.shader_parameters = { r:0.5, g:1.0, b:0.4, a:0.5 };
         
         // add content to node:
-        test_node.add_content(content3d);
+        //test_node.add_content(content3d);
 		
 		// build test scene:
 		this.test_scene_materials = new Rodin.TestSceneMaterials(this.shaders);
@@ -179,13 +178,57 @@
             window.requestAnimFrame(app.animation_loop_closure, document.getElementById("viewport"));
         }
 		
+		
         // start main loop:
         this.animation_loop_closure();
 		
 		this.refresh();
+		
+		
+		this.object3d_loader = new Rodin.Object3dLoader(this.shaders);
+		this.object3d_loader.loaded = function() { app.refresh_viewport(); }
+		
+		this.ajax_update_available_objects();
     }
     
     Rodin.TestApp.prototype = {
+	
+		ajax_update_available_objects: function() {
+		
+			var app = this;
+			$.getJSON('/available_objects', function(data) { app._on_ajax_available_objects_success(data); } );
+		},
+		
+		_on_ajax_available_objects_success : function(data) {
+		
+			var available_objects = [];
+			$.each(data, function(key, val) {
+				
+				//console.log('<li><a class="view_object_link" href="'+val+'">'+val+'</li>');
+				available_objects.push('<li><a class="view_object_link" href="'+val+'">'+val+'</a></li>');
+			});
+			
+			$("#available_objects_li").empty();
+			$("#available_objects_li").append( available_objects.join('') );
+
+			// configures new links events:
+			var app = this;
+			$(".view_object_link").click( function(event) {
+				
+				var object_name = $(this).attr('href');
+				app.object3d_loader.load_object3d(app.scene3d.root, object_name);
+				
+				//$.getJSON('/available_objects', function(data) { app._on_ajax_available_objects_success(data); } );
+				
+				/*
+				$.get( $(this).attr('href'), function(msg) {
+					  alert( "Data Saved: " + msg );
+				 });
+				alert( "Data Saved: " + msg );
+				*/
+				event.preventDefault();
+			});
+		},
     
         refresh: function() {
         

@@ -83,7 +83,7 @@
 		
 		this.vertices = null; // Rodin.WebGlVertices
 		this.normals = null;  // Rodin.WebGlVertices
-		this.uv = null;		  // Rodin.WebGlVertices
+		this.uvs = null;		  // Rodin.WebGlVertices
 		this.colors = null;   // Rodin.WebGlVertices
 		
 		// POINTS, LINES, LINE_LOOP, LINE_STRIP, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN

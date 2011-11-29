@@ -182,7 +182,7 @@
 			else {
 			
 				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.indices.buffer);
-				gl.drawElements(mesh.vertices_type, mesh.indices.length, gl.UNSIGNED_SHORT, 0);
+				gl.drawElements(mesh.vertices_type, mesh.indices.length, gl.UNSIGNED_SHORT, 0);				
 			}
 			
 			gl.disableVertexAttribArray(this.attribute_position_index);
