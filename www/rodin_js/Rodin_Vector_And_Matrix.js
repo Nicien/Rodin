@@ -57,9 +57,19 @@
     
     Rodin.Vector3 = function(x, y, z) {
         
-        this.x = x;
-        this.y = y;
-        this.z = z;
+		if (x == undefined) {
+		
+			this.x = 0.0;
+			this.y = 0.0;
+			this.z = 0.0;
+		}
+		else {
+		
+			this.x = x;
+			this.y = y;
+			this.z = z;
+		}
+		
     }
     
     Rodin.Vector3.prototype = {
@@ -80,14 +90,20 @@
             return this;
         },
         
-        add: function(other) {
+        add: function(other, v3_out) {
         
-            this.x += other.x; this.y += other.y; this.z += other.z;
+			v3_out.x = this.x + other.x;
+			v3_out.y = this.y + other.y;
+			v3_out.z  = this.z + other.z;
+			return v3_out;
         },
         
-        sub: function(other) {
+        sub: function(other, v3_out) {
         
-            this.x -= other.x; this.y -= other.y; this.z -= other.z;
+			v3_out.x = this.x - other.x;
+			v3_out.y = this.y - other.y;
+			v3_out.z = this.z - other.z;
+			return v3_out;
         },
         
         dot_product: function(other) {
@@ -96,8 +112,6 @@
         },
         
         cross_product: function(other, v3_out) {
-            
-            v3_out = Rodin.Vector3.make(v3_out);
             
             v3_out.x = this.y * other.z - this.z * other.y;
             v3_out.y = this.z * other.x - this.x * other.z;
@@ -121,43 +135,17 @@
         
         direction: function(other, v3_out) {
         
-            v3_out = Rodin.Vector3.make(v3_out, this); 
-            
-            v3_out.sub(other);
+			this.sub(other, v3_out);
             v3_out.normalize();
-            
+			
             return v3_out;
         }
         
     }
     
-    /*
-        'make' function
-        example:
-            Rodin.Vector3.make();               // create and return a new Vector3(0.0, 0.0, 0.0)
-            Rodin.Vector3.make(v3_out);         // leave v3_out untouched and return v3_out
-            Rodin.Vector3.make(v3_out, src);    // create v3_out if undefined, copy src to v3_out and return v3_out
-    */
-    Rodin.Vector3.make = function(v3_out, src) {
-    
-        if (v3_out == undefined) {
-        
-            v3_out = 
-                (src == undefined) ?
-                new Rodin.Vector3(0.0, 0.0, 0.0) :
-                new Rodin.Vector3(src.x, src.y, src.z);
-        }
-        else if (src != undefined) {
-        
-            v3_out.assign(src);
-        }
-        return v3_out;
-    }
-    
     Rodin.Vector3.AxisX = new Rodin.Vector3(1.0, 0.0, 0.0);
     Rodin.Vector3.AxisY = new Rodin.Vector3(0.0, 1.0, 0.0);
-    Rodin.Vector3.AxisZ = new Rodin.Vector3(0.0, 0.0, 1.0);
-    
+    Rodin.Vector3.AxisZ = new Rodin.Vector3(0.0, 0.0, 1.0);    
     
     // ---------------------- Mat3x2 ----------------------
     

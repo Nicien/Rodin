@@ -187,8 +187,7 @@ main();
     <script type="text/javascript" src="./rodin_js/Rodin_Object3dLoader.js"></script>
 	
     <script type="text/javascript" src="./rodin_js/Rodin_coding.js"></script>
-
-	
+    <script type="text/javascript" src="./rodin_js/Rodin_MeshManipulator.js"></script>	
 	
 	<script id="vertex_shader_projection" type="x-shader/x-vertex">
 		#ifdef GL_ES

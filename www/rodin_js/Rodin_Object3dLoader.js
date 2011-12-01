@@ -55,67 +55,38 @@
 				
 					var mesh = each_group.meshes[mesh_index];
 					
-					// convert classic array to webgl array:
-					var indices = new Uint16Array(mesh.indices);
-					var vertices = new Float32Array(mesh.vertices);
-					var normals = new Float32Array(mesh.normals);
-					var uvs = new Float32Array(mesh.uvs);
+					var mesh_manipulator = new Rodin.MeshManipulator();
+					mesh_manipulator.set_arrays(mesh.indices, mesh.vertices, mesh.normals, mesh.uvs);
 					
-					mesh = null; // javascript garbage collector can release the mesh...
+					mesh = null; // javascript garbage collector can release the mesh... we don't need it anymore
 					
 					// scale object
-					var c = vertices.length;
+					var c = mesh_manipulator.vertices.length;
 					for (var ii = 0; ii != c; ++ii) {
 					
-						vertices[ii] /= 3.0;
+						mesh_manipulator.vertices[ii] /= 3.0;
 					}
 					
 					// generate normals if needed:
-					if (normals.length == 0) {
+					if (mesh_manipulator.normals.length == 0) {
 					
-						// generate normals:
-						normals = new Float32Array(vertices.length);
-						
-						var face_count = indices.length;
-						// ASSERT( (face_count % 3) == 0 );
-						face_count -= face_count % 3;
-						
-						for (var face_index = 0; face_index != face_count; face_index += 3) {
-						
-							vertices[face_index+0];
-						}
-						
-						//Vector3 normal = plane_normal(mesh.vertices[*(each_face+0)], mesh.vertices[*(each_face+1)], mesh.vertices[*(each_face+2)]);
-						//mesh.normals[*(each_face+0)] = normal;
-						//mesh.normals[*(each_face+1)] = normal;
-						//mesh.normals[*(each_face+2)] = normal;
-						
-						// Vector3 normal = (pt1 - pt0).crossProduct(pt2 - pt0);
-						// normal.normalize();
-						
-						// cross product:
-						//Y * p.Z - Z * p.Y, Z * p.X - X * p.Z, X * p.Y - Y * p.X
+						mesh_manipulator.recompute_normals();
 					}
-
+			
 					/*
-					console.log('triangles length = '+indices.length/3);
-					console.log('vertices length = '+vertices.length/3);
-					console.log('normals normals = '+normals.length/3);
-					console.log('textureCoords length = '+uvs.length/2);
+
 					*/
 
-					
 					// build a mesh:
 					var content3d = new Rodin.Content3d();
-					content3d.mesh = new Rodin.Mesh3d();
-					
-					content3d.mesh.indices = new Rodin.WebGlIndices(indices);
-					content3d.mesh.vertices = new Rodin.WebGlVertices(vertices);
-					content3d.mesh.normals = new Rodin.WebGlVertices(normals);
-					content3d.mesh.uvs = new Rodin.WebGlVertices(uvs);
-					
+					content3d.mesh = mesh_manipulator.make_mesh_3d();
 					content3d.shader = this.shaders.soft_directional_lighting;
 					content3d.shader_parameters = { r:1.0, g:0.2, b:0.2, a:1.0 };
+					
+					console.log('triangles length = '+mesh_manipulator.indices.length/3);
+					console.log('vertices length = '+mesh_manipulator.vertices.length/3);
+					console.log('normals length = '+mesh_manipulator.normals.length/3);
+					console.log('textureCoords length = '+mesh_manipulator.uvs.length/2);
 					
 					node_3d.add_content(content3d);
 				}
