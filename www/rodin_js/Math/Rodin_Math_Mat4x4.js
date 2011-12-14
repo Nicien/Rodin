@@ -1,276 +1,6 @@
 
 (function () {
-    // ---------------------- Vector2 ----------------------
-    
-    Rodin.Vector2 = function(x, y) {
-    
-        this.x = x;
-        this.y = y;
-    }
-    
-    Rodin.Vector2.prototype = {
-    
-        clone: function() {
-        
-            return new Rodin.Vector2(this.x, this.y);
-        },
-        
-        assign: function(other) {
-            
-            this.x = other.x; this.y = other.y;
-            return this;
-        },
-        
-        add: function(other) {
-        
-            this.x += other.x; this.y += other.y;
-        },
-        
-        sub: function(other) {
-        
-            this.x -= other.x; this.y -= other.y;       
-        },
-        
-        dot_product: function(other) {
-        
-            return this.x * other.x + this.y * other.y;
-        },
-        
-        length: function() {
-        
-            return Math.sqrt(this.x * this.x + this.y * this.y); 
-        },
-        
-        normalize: function() {
-        
-            var len_inv = 1 / this.length();
-            this.x *= len_inv;
-            this.y *= len_inv;
-        }
-        
-    }
-    
-    Rodin.Vector2.AxisX = new Rodin.Vector2(1.0, 0.0);
-    Rodin.Vector2.AxisY = new Rodin.Vector2(0.0, 1.0);
-    
-    // ---------------------- Vector3 ----------------------
-    
-    Rodin.Vector3 = function(x, y, z) {
-        
-		if (x == undefined) {
-		
-			this.x = 0.0;
-			this.y = 0.0;
-			this.z = 0.0;
-		}
-		else {
-		
-			this.x = x;
-			this.y = y;
-			this.z = z;
-		}
-		
-    }
-    
-    Rodin.Vector3.prototype = {
-    
-        clone: function() {
-        
-            return new Rodin.Vector3(this.x, this.y, this.z);
-        },
-        
-        set: function(x, y, z) {
-        
-            this.x = x; this.y = y; this.z = z;
-        },
-        
-        assign: function(other) {
-            
-            this.x = other.x; this.y = other.y; this.z = other.z;
-            return this;
-        },
-        
-        add: function(other, v3_out) {
-        
-			v3_out.x = this.x + other.x;
-			v3_out.y = this.y + other.y;
-			v3_out.z  = this.z + other.z;
-			return v3_out;
-        },
-        
-        sub: function(other, v3_out) {
-        
-			v3_out.x = this.x - other.x;
-			v3_out.y = this.y - other.y;
-			v3_out.z = this.z - other.z;
-			return v3_out;
-        },
-        
-        dot_product: function(other) {
-        
-            return this.x * other.x + this.y * other.y + this.z * other.z;
-        },
-        
-        cross_product: function(other, v3_out) {
-            
-            v3_out.x = this.y * other.z - this.z * other.y;
-            v3_out.y = this.z * other.x - this.x * other.z;
-            v3_out.z = this.x * other.y - this.y * other.x;
-            
-            return v3_out;
-        },
-        
-        length: function() {
-        
-            return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z); 
-        },
-        
-        normalize: function() {
-        
-            var len_inv = 1.0 / this.length();
-            this.x *= len_inv;
-            this.y *= len_inv;
-            this.z *= len_inv;
-        },
-        
-        direction: function(other, v3_out) {
-        
-			this.sub(other, v3_out);
-            v3_out.normalize();
-			
-            return v3_out;
-        }
-        
-    }
-    
-    Rodin.Vector3.AxisX = new Rodin.Vector3(1.0, 0.0, 0.0);
-    Rodin.Vector3.AxisY = new Rodin.Vector3(0.0, 1.0, 0.0);
-    Rodin.Vector3.AxisZ = new Rodin.Vector3(0.0, 0.0, 1.0);    
-    
-    // ---------------------- Mat3x2 ----------------------
-    
-    Rodin.Mat3x2 = function(sx, shy, shx, sy, tx, ty)
-    {
-        this.sx = sx; this.shy = shy; this.shx = shx;
-        this.sy = sy; this.tx = tx;   this.ty = ty;
-    }
-    
-    Rodin.Mat3x2.prototype = {
 
-        set_values: function(sx, shy, shx, sy, tx, ty) {
-            
-            this.sx = sx; this.shy = shy; this.shx = shx;
-            this.sy = sy; this.tx = tx;   this.ty = ty;
-        },
-        
-        clone: function() {
-        
-            return new Rodin.Mat3x2(this.sx, this.shy, this.shx, this.sy, this.tx, this.ty);
-        },
-        
-        assign: function(src) {
-        
-            this.sx = other.sx; this.shy = other.shy; this.shx = other.shx;
-            this.sy = other.sy; this.tx = other.tx; this.ty = other.ty;
-            return this;
-        },
-        
-        multiply: function(other) {
-            
-            var t0 = this.sx * other.sx + this.shy * other.shx;
-            var t2 = this.shx * other.sx + this.sy  * other.shx;
-            var t4 = this.tx  * other.sx + this.ty  * other.shx + other.tx;
-            this.shy = this.sx  * other.shy + this.shy * other.sy;
-            this.sy  = this.shx * other.shy + this.sy  * other.sy;
-            this.ty  = this.tx  * other.shy + this.ty  * other.sy + other.ty;
-            this.sx  = t0;
-            this.shx = t2;
-            this.tx  = t4;
-        },
-        
-        determinant: function() {
-        
-            return sx * sy - shy * shx;
-        },
-        
-        determinant_reciprocal: function() {
-        
-            return 1.0 / (sx * sy - shy * shx);
-        },
-        
-        invert: function() {
-        
-            var d = determinant_reciprocal();
-            
-            var t0 = sy  * d;
-                sy  =  sx  * d;
-                shy = -shy * d;
-                shx = -shx * d;
-
-            var t4 = -tx * t0  - ty * shx;
-                ty = -tx * shy - ty * sy;
-
-            sx = t0;
-            tx = t4;
-        },
-        
-        transform: function(vertex) {
-            
-            var tmp = vertex.x;
-            vertex.x = tmp * sx  + vertex.x * shx + tx;
-            vertex.y = tmp * shy + vertex.y * sy  + ty;
-        },
-        
-        transform_2x2: function(vector) {
-        
-            var tmp = vector.x;
-            vector.x = tmp * sx  + vector.x * shx;
-            vector.y = tmp * shy + vector.y * sy;
-        }
-
-    }
-    
-    Rodin.Mat3x2.make_matrix_with_components = function(sx, shy, shx, sy, tx, ty, mat_out) {
-    
-        if (mat_out == undefined) {
-        
-            mat_out = new Rodin.Mat3x2(sx, shy, shx, sy, tx, ty);
-        }
-        else {
-        
-            mat_out.set_values(sx, shy, shx, sy, tx, ty);
-        }
-        
-        return mat_out;
-    }
-    
-    Rodin.Mat3x2.make_identity = function(mat_out) {
-        
-        return Rodin.Mat3x2.make_matrix_with_components(1.0, 0.0, 0.0, 1.0, 0.0, 0.0, mat_out);
-    }
-        
-    Rodin.Mat3x2.make_translation = function(x, y, mat_out) {
-        
-        return Rodin.Mat3x2.make_matrix_with_components(1.0, 0.0, 0.0, 1.0, x, y, mat_out);
-    }
-        
-    Rodin.Mat3x2.make_rotation = function(a, mat_out) {
-        
-        var cos_a = Math.cos(a);
-        var sin_a = Math.sin(a);
-        return Rodin.Mat3x2.make_matrix_with_components(cos_a, sin_a, -sin_a, cos_a, 0.0, 0.0, mat_out);        
-    }
-        
-    Rodin.Mat3x2.make_scaling = function(x, y, mat_out) {
-        
-        return Rodin.Mat3x2.make_matrix_with_components(x, 0.0, 0.0, y, 0.0, 0.0, mat_out);        
-    }
-    
-    
-    
-    // ---------------------- Mat4x4 ----------------------
-    
-    
     // 'values' parameter can be:
     //      'undefined' - initialize with identity matrix
     //      javascript array of 16 floats
@@ -321,15 +51,12 @@
         },
         
 		
-        multiply: function(other) {
+        multiply: function(other, mat_out) {
         
-			Rodin.Mat4x4.make_multiply(this, other, this);
+			if (mat_out == undefined) mat_out = this;
+			
+			return Rodin.Mat4x4.make_multiply(this, other, mat_out);
         },
-		
-		set_multiply : function(left, right) {
-		
-			Rodin.Mat4x4.make_multiply(left, right, this);
-		},
 		
         translate: function(translate) {
         
@@ -375,20 +102,9 @@
                 0.0, 0.0, 1.0, 0.0,
                 0.0, 0.0, 0.0, 1.0]);
     
-    Rodin.Mat4x4.make_identity = function(mat_out) {
-    
-        if (mat_out == undefined) {
-			mat_out = new Rodin.Mat4x4();
-		}
-		else {
-			mat_out.assign(Rodin.Mat4x4.identity);
-		}
-        return mat_out;
-    }
-    
+	/* // unused
     Rodin.Mat4x4.make_translate = function(translate, mat_out) {
     
-        if (mat_out == undefined) mat_out = new Rodin.Mat4x4();
         var r = mat_out.buffer;
         
         r[0] = 1;
@@ -410,7 +126,8 @@
         
         return mat_out;
     }
-    
+    */
+	
     /*
          Creates a transformation matrix for rotation by angle radians about the 3-element vector axis.
          Parameters:
@@ -419,9 +136,9 @@
     */
     Rodin.Mat4x4._rotation_tmp = new Rodin.Vector3(0, 0, 0);
     
+	/* unused
     Rodin.Mat4x4.make_rotation_matrix = function(angle, axis_p, mat_out) {
         
-        if (mat_out == undefined) mat_out = new Rodin.Mat4x4();
         var r = mat_out.buffer;
         
         var axis = _rotation_tmp.assign(axis_p);
@@ -451,10 +168,10 @@
         
         return mat_out;
     }
-    
+    */
+	/* unused
     Rodin.Mat4x4.make_scale = function(scale, mat_out) {
     
-        if (mat_out == undefined) mat_out = new Rodin.Mat4x4();
         var r = mat_out.buffer;
         
         r[ 0] = scale.x;
@@ -476,11 +193,35 @@
         
         return mat_out;
     }
+	*/
+	
+	Rodin.Mat4x4.make_translate_scale = function(translate, scale, mat_out) {
+	
+        var r = mat_out.buffer;
+		
+        r[ 0] = scale.x;
+        r[ 1] = 0;
+        r[ 2] = 0;
+        r[ 3] = 0;
+        r[ 4] = 0;
+        r[ 5] = scale.y;
+        r[ 6] = 0;
+        r[ 7] = 0;
+        r[ 8] = 0;
+        r[ 9] = 0;
+        r[10] = scale.z;
+        r[11] = 0;
+		r[12] = translate.x;
+        r[13] = translate.y;
+        r[14] = translate.z;
+        r[15] = 1;
+		
+        return mat_out;
+	}
 
     
     Rodin.Mat4x4.make_frustrum = function(left, right, bottom, top, znear, zfar, mat_out) {
     
-        if (mat_out == undefined) mat_out = new Rodin.Mat4x4();
         var r = mat_out.buffer;
         
         var X = 2*znear/(right-left);
@@ -522,7 +263,6 @@
     
     Rodin.Mat4x4.make_ortho = function (left, right, bottom, top, znear, zfar, mat_out) {
     
-        if (mat_out == undefined) mat_out = new Rodin.Mat4x4();
         var r = mat_out.buffer;
             
         var tX = -(right+left)/(right-left);
@@ -572,8 +312,6 @@
         
         var y = z.cross_product(x, Rodin.Mat4x4._look_at_tmp_3);
         z.normalize();
-
-        if (mat_out == undefined) mat_out = new Rodin.Mat4x4();
         
         var tm1 = mat_out.buffer;
         var tm2 = Rodin.Mat4x4._look_at_mtx.buffer;
@@ -605,8 +343,6 @@
     }
 	
 	Rodin.Mat4x4.make_multiply = function(left, right, mat_out) {
-	
-        if (mat_out == undefined) mat_out = new Rodin.Mat4x4();
 		
 		var a = left.buffer;
 		var b = right.buffer;

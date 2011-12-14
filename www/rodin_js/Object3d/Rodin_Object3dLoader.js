@@ -1,6 +1,7 @@
 
 (function() {
 
+	// TODO: le cache de la requète ajax est désactivé
     
     Rodin.Object3dLoader = function(shaders) {
     
@@ -8,7 +9,6 @@
 		this.current_ajax_request = null;
 		this.loaded = null;
     }
-    
     
     Rodin.Object3dLoader.prototype = {
     
@@ -22,9 +22,6 @@
 			
 			var loader = this;
 			this.current_ajax_request = $.ajax({
-				//url: '/obj_name/ahstray2',
-				//url: '/obj_name/toyplane',
-				//url: '/obj_name/dchair_obj',
 				url: '/obj_name/'+object_name,
 				context: document.body,
 				cache  : false,
@@ -72,11 +69,6 @@
 					
 						mesh_manipulator.recompute_normals();
 					}
-			
-					/*
-
-					*/
-
 					// build a mesh:
 					var content3d = new Rodin.Content3d();
 					content3d.mesh = mesh_manipulator.make_mesh_3d();

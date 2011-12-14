@@ -11,7 +11,7 @@
 		
 		// compatibility:
         window.requestAnimFrame = (function(){
-            return window.requestAnimationFrame       || 
+            return window.requestAnimationFrame    || 
                 window.webkitRequestAnimationFrame || 
                 window.mozRequestAnimationFrame    || 
                 window.oRequestAnimationFrame      || 
@@ -21,10 +21,9 @@
                 };
         })();
 		
-        
         // init 3d viewport
         this.gl_renderer = new Rodin.WebGlRenderer();
-        if (this.gl_renderer.init( document.getElementById("viewport") ) == false) {
+        if (this.gl_renderer.init(document.getElementById("viewport")) == false) {
         
             alert("Could not initialise WebGL, sorry :-(");
         }        
@@ -32,8 +31,8 @@
         // initialize shaders:
         this.shaders = new Rodin.Shaders();
         this.shaders.load_all_shaders();
-
-        // init 2d canvas
+		
+		// init 2d canvas
         this.canvas = document.getElementById("floorplan");
         
         // très important: permet d'éviter un scaling du bitmap et une perte de qualité
@@ -45,13 +44,12 @@
         this.scene = new Rodin.Scene();
         
 
-        
-        // init tools:        
-        this.tool_manager = new Rodin.ToolManager();
-        this.tool_manager.j_canvas = $("#floorplan");
-        
-        
 		this.camera_mgr = new Rodin.CameraMgr();
+		
+		Rodin.cursor_mgr = new Rodin.CursorMgr($("#floorplan"), $("#viewport"));
+		
+        // init tools:        
+        this.tool_manager = new Rodin.ToolManager( new Rodin.MoveCameraTool(this.camera_mgr) );
         
         var app = this;
         
@@ -109,13 +107,13 @@
         
         $("#stop_current_tool_button").click( function(event) {
         
-            app.tool_manager.set_current_tool(null);
+            app.tool_manager.active_default_tool();
             event.preventDefault();
         });
 		        
-        $("#front_camera").click( function(event) {
+        $("#free_camera").click( function(event) {
         
-			app.camera_mgr.set_camera_mode_front();
+			app.camera_mgr.set_camera_mode_free();
 			app.refresh_viewport();
             event.preventDefault();
         });
@@ -131,6 +129,23 @@
         
 			app.camera_mgr.set_animate_camera( ! app.camera_mgr.animate_camera);
             event.preventDefault();
+        });
+		
+		var viewport_j = $("#viewport");
+        
+        viewport_j.mousedown( function(event) {
+            app.tool_manager.mouse_down(event, viewport_j);
+            app.refresh();
+        });
+        
+        viewport_j.mousemove( function(event) {
+            app.tool_manager.mouse_move(event, viewport_j);
+            app.refresh();
+        });
+        
+        viewport_j.mouseup( function(event) {
+            app.tool_manager.mouse_up(event, viewport_j);
+            app.refresh();
         });
 		
         // fill 2d scene:
@@ -162,7 +177,7 @@
         content3d.shader_parameters = { r:0.5, g:1.0, b:0.4, a:0.5 };
         
         // add content to node:
-        //test_node.add_content(content3d);
+        // test_node.add_content(content3d);
 		
 		// build test scene:
 		this.test_scene_materials = new Rodin.TestSceneMaterials(this.shaders);
@@ -171,6 +186,15 @@
 		// generate grid:
 		var grid_generator = new Rodin.GridGenerator();		
 		grid_generator.generate_mesh(this.test_scene_materials, test_node);
+		
+		// another grid on the top:
+        var test_node_top = this.scene3d.root.add_child();
+		test_node_top.share_content(test_node);
+		
+		var t = test_node_top.use_classic_transform();
+		t.translation.set(0, 3, 0);
+		//t.scaling.set(2, 1, 0.5);
+		test_node_top.update_classic_transform();
 		
         this.animation_loop_closure = function() {
             
@@ -183,7 +207,6 @@
         this.animation_loop_closure();
 		
 		this.refresh();
-		
 		
 		this.object3d_loader = new Rodin.Object3dLoader(this.shaders);
 		this.object3d_loader.loaded = function() { app.refresh_viewport(); }

@@ -1,0 +1,231 @@
+﻿<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Rodin testing</title>
+    
+    <link rel="stylesheet" type="text/css" href="rodin_test.css"/>
+	
+	<link type="text/css" href="jquery-ui/css/rodin-theme-1/jquery-ui-1.8.16.custom.css" rel="stylesheet" />	
+    <script type="text/javascript" src="jquery-1.6.4.min.js"></script>
+	<script type="text/javascript" src="jquery-ui/js/jquery-ui-1.8.16.custom.min.js"></script>
+	
+    <!-- <script type="text/javascript" src="./rodin_js/poly2tri.js"></script> -->
+    
+    <script type="text/javascript" src="./rodin_js/Rodin.js"></script>
+	
+    <script type="text/javascript" src="./rodin_js/Math/Rodin_Math_Vector2.js"></script>
+	<script type="text/javascript" src="./rodin_js/Math/Rodin_Math_Vector3.js"></script>
+	<script type="text/javascript" src="./rodin_js/Math/Rodin_Math_Mat3x2.js"></script>
+	<script type="text/javascript" src="./rodin_js/Math/Rodin_Math_Mat4x4.js"></script>
+	<script type="text/javascript" src="./rodin_js/Math/Rodin_Math_ClassicTransform.js"></script>
+    
+    <script type="text/javascript" src="./rodin_js/WebGlRenderer/Rodin_WebGlRenderer.js"></script>
+    <script type="text/javascript" src="./rodin_js/WebGlRenderer/Rodin_WebGlShader.js"></script>
+    <script type="text/javascript" src="./rodin_js/WebGlRenderer/Rodin_WebGlBuffer.js"></script>
+    <script type="text/javascript" src="./rodin_js/WebGlRenderer/Rodin_Shaders.js"></script>
+    <script type="text/javascript" src="./rodin_js/WebGlRenderer/Rodin_Shader_PlainColor.js"></script>
+    <script type="text/javascript" src="./rodin_js/WebGlRenderer/Rodin_Shader_SoftDirectionalLighting.js"></script>
+	
+    <script type="text/javascript" src="./rodin_js/Scene3d/Rodin_Camera3d.js"></script>
+    <script type="text/javascript" src="./rodin_js/Scene3d/Rodin_Scene3d.js"></script>
+    <script type="text/javascript" src="./rodin_js/Scene3d/Rodin_Node3d.js"></script>
+    <script type="text/javascript" src="./rodin_js/Scene3d/Rodin_Content3d_Mesh3d.js"></script>
+    
+    <script type="text/javascript" src="./rodin_js/Object3d/Rodin_Object3dLoader.js"></script>
+    <script type="text/javascript" src="./rodin_js/Object3d/Rodin_MeshManipulator.js"></script>
+	
+    <script type="text/javascript" src="./rodin_js/Rodin_CursorMgr.js"></script>
+    <script type="text/javascript" src="./rodin_js/Rodin_ToolManager.js"></script>
+    <script type="text/javascript" src="./rodin_js/Rodin_MoveCameraTool.js"></script>	
+    <script type="text/javascript" src="./rodin_js/Rodin_TraceRectangleTool.js"></script>
+    <script type="text/javascript" src="./rodin_js/Rodin_TraceLineTool.js"></script>
+    	
+    <script type="text/javascript" src="./rodin_js/TestApp/Rodin_TestSceneMaterials.js"></script>
+    <script type="text/javascript" src="./rodin_js/TestApp/Rodin_GridGenerator.js"></script>
+    <script type="text/javascript" src="./rodin_js/TestApp/Rodin_TestApp.js"></script>
+    <script type="text/javascript" src="./rodin_js/TestApp/Rodin_CameraMgr.js"></script>
+    <script type="text/javascript" src="./rodin_js/TestApp/Rodin_CameraController.js"></script>
+	
+    <script type="text/javascript" src="./rodin_js/Rodin_Camera2d.js"></script>
+    <script type="text/javascript" src="./rodin_js/Rodin_coding.js"></script>
+	
+	
+	<script id="vertex_shader_projection" type="x-shader/x-vertex">
+		#ifdef GL_ES
+		precision highp float;
+		#endif
+
+		uniform mat4 u_transform;
+
+        attribute vec3 a_position;
+		  
+        void main(void) {
+		
+            gl_Position = u_transform * vec4(a_position, 1.0);
+        }
+    </script>
+	    
+    <script id="frament_shader_plain_color" type="x-shader/x-fragment">  
+		#ifdef GL_ES
+		precision highp float;
+		#endif
+		
+		uniform vec3 u_plain_color;
+		
+        void main(void) {
+		
+            gl_FragColor = vec4(u_plain_color, 1.0);  
+        }
+    </script>
+	
+	
+	<script id="vertex_shader_vertex_normal" type="x-shader/x-vertex">
+		#ifdef GL_ES
+		precision highp float;
+		#endif
+		
+		uniform mat4 u_vertex_transform;
+		uniform mat3 u_normal_transform;
+
+		attribute vec3 a_position;
+		attribute vec3 a_normal;
+		//attribute vec2 a_texcoord;
+
+		//varying vec2 v_texcoord;
+		varying vec3 v_normal;
+		
+
+		void main(void) {
+			
+			//vec3 v_normal = u_normal_transform * normalize(a_normal);
+			v_normal = u_normal_transform * a_normal;
+			gl_Position = u_vertex_transform * vec4(a_position, 1.0);
+		}
+    </script>
+	
+    <script id="frament_shader_soft_directional_lighting" type="x-shader/x-fragment"> 
+		#ifdef GL_ES
+		precision mediump float;
+		#endif
+
+		uniform vec3 u_plain_color;
+		
+		//uniform sampler2D u_diffuse_sampler;
+
+		varying vec2 v_texcoord;
+		varying vec3 v_normal;
+	
+		void main(void) {
+			// Simple, soft directional lighting.
+			//vec3 fetch = texture2D(u_diffuse_sampler, v_texcoord).rgb;
+			vec3 normal = normalize(v_normal);
+			vec3 light_vec = normalize(vec3(-0.25, -0.25, 1.0));
+			float light = 0.5 + 0.5*dot(normal, light_vec);
+			gl_FragData[0] = vec4(u_plain_color*light, 1.0);
+		}
+    </script>	
+
+</head>
+
+<body>
+    <TABLE class="main_table">
+    <TR>
+        <TH colspan="2">
+            <H3>Rodin test</H3>
+        </TH>
+    </TR>
+    <TR>
+        <TD class="canvas_td">
+            <canvas id="floorplan" class="floorplan">
+                <span>&lt;canvas&gt; markup not supported, please use a modern web browser.</span>
+            </canvas>
+        </TD>
+        <TD>
+            <canvas id="viewport" class="viewport">
+                <span>&lt;canvas&gt; markup not supported, please use a modern web browser.</span>
+            </canvas>
+        </TD>
+    </TR>
+    <TR>
+        <TD colspan="2">
+            <TABLE class="toolbox_table">
+            
+                <caption id="mouse_position" style="caption-side:bottom;height:20px">0, 0</caption>
+                <tbody>
+                <TR>
+                    <TD> <a href="" id="trace_segment_button" class="trace_button">Trace segment</a>
+                    <TD> <a href="" id="trace_line_button" class="trace_button">Trace line</a>
+                    <TD> <a href="" id="trace_rectangle_button" class="trace_button">Trace rectangle</a>
+					
+					<TD> <a href="" id="free_camera" class="trace_button">Free camera</a>
+                    <TD ><a href="" id="orbit_camera" class="trace_button">Orbit camera</a>
+                <TR>
+                    <TD colspan="3"><a href="#" id="stop_current_tool_button" class="trace_button">Stop</a>
+					
+                    <TD colspan="2"><a href="" id="animate_camera" class="trace_button">Animate camera</a>
+				<TR>
+					<TD id="camera_buttons_container">
+						<button class="camera_button-forward">Forward</button>
+						<button class="camera_button-left">Left</button>
+						<button class="camera_button-right">Right</button>
+						<button class="camera_button-backward">Backward</button>
+						
+					
+            </TABLE>
+			
+        </TD>
+		
+    </TR>
+    </TABLE>
+	
+    <ul id="available_objects_li"></ul>
+	
+	<input type="text" name="date" id="date" />
+	
+	<div class="log"></div>
+	
+    <script>
+        $(document).ready(function(){
+        
+			var app = new Rodin.TestApp();
+            Rodin.app = app;
+			
+			
+			$( "div.log" ).ajaxError(function(e, jqxhr, settings, exception) {
+			  if (settings.dataType=='script') {
+				$(this).text( "Triggered ajaxError handler."+e );
+			  }
+			});
+			
+			$('#date').datepicker();
+			
+			Rodin.camera_controller = new Rodin.CameraController();
+			Rodin.camera_controller.view = $("#camera_buttons_container");
+			Rodin.camera_controller.camera_mgr = app.camera_mgr;
+			Rodin.camera_controller.camera_moved_callback = function() { app.refresh(); }
+			Rodin.camera_controller.initialize();
+			
+			
+			$(function() {
+				//$( "button", ".camera_buttons_container" ).button();
+				
+				/*
+				$( "button", ".camera_buttons_container" ).click
+				(
+					function(event) {
+					
+						alert( $(event.target).parent().class() );
+						//alert( $("button[class|=forward]", event.target).length );
+						
+						event.preventDefault();
+					}
+				);
+				*/
+			});
+        });
+    </script>
+</body>
+
+</html>

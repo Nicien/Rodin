@@ -13,6 +13,8 @@
 		this.local_transform = new Rodin.Mat4x4();
 		this.absolute_transform = new Rodin.Mat4x4();
 		
+		this.classic_transform = null;
+		
 		this.content_array = [];
     }
     
@@ -49,9 +51,28 @@
 			}
 		},
 		
+		// warning: don't use 'set_local_transform' and 'use_classic_transform' at the same time
 		set_local_transform : function(new_local_transform) {
 		
+			Rodin.assert(this.classic_transform == null);
 			this.local_transform = new_local_transform;
+			this._update_absolute_transform();
+		},
+		
+		// warning: don't use 'set_local_transform' and 'use_classic_transform' at the same time
+		use_classic_transform : function() {
+		
+			//Rodin.assert(this.local_transform == identity);
+			if (this.classic_transform == null) {
+				this.classic_transform = new Rodin.ClassicTransform(this.local_transform);
+			}
+			
+			return this.classic_transform;
+		},
+		
+		update_classic_transform : function() {
+		
+			this.classic_transform.update_transform();
 			this._update_absolute_transform();
 		},
 		
@@ -65,11 +86,16 @@
 			this.content_array.splice(arr.indexOf(content), 1);
 		},
 		
-		_update_absolute_transform : function() {
+		share_content : function(node) {
 		
+			this.content_array = node.content_array;
+		},
+		
+		_update_absolute_transform : function() {
+			
 			if (this.parent != null) {
 				
-				this.absolute_transform.set_multiply(this.parent.absolute_transform, this.local_transform);
+				this.parent.absolute_transform.multiply(this.local_transform, this.absolute_transform);
 			}
 			else {
 			
