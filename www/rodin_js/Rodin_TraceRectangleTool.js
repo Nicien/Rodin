@@ -12,17 +12,22 @@
     }
     
     Rodin.TraceRectangleTool.prototype = {
-    
-        activate: function(mouse_event) {
+		
+    	accept_event: function(mouse_event) {
+		
+			return mouse_event.is_floorplan();
+		},
+		
+        activate: function() {
             
             this.origin_button_j.addClass("trace_button_selected");
-            $("#floorplan").css('cursor', 'crosshair');
+			Rodin.cursor_mgr.set_standard_cursor(Rodin.viewport_type.floorplan, 'crosshair');
         },
         
-        desactivate: function(mouse_event) {
+        desactivate: function() {
         
             this.origin_button_j.removeClass("trace_button_selected");
-            $("#floorplan").css('cursor', '');
+			Rodin.cursor_mgr.reset_cursor(Rodin.viewport_type.floorplan);
         },
         
         mouse_down: function(mouse_event) {
